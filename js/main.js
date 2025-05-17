@@ -170,38 +170,9 @@ const artGalleries = [
     }
 ];
 
-// 使用高德地图API获取更多美术馆数据
+// 使用预设的艺术馆数据，不再从高德地图API获取图片
 function fetchMoreGalleries() {
-    console.log("从高德地图API获取更多美术馆数据...");
-    
-    // 使用高德地图API的POI搜索服务
-    AMap.plugin('AMap.PlaceSearch', function() {
-        const placeSearch = new AMap.PlaceSearch({
-            city: '武汉',
-            type: '文化,艺术,美术馆',
-            pageSize: 20,
-            pageIndex: 1
-        });
-        
-        placeSearch.search('美术馆 艺术馆', function(status, result) {
-            if (status === 'complete' && result.info === 'OK') {
-                const pois = result.poiList.pois;
-                // 处理获取到的POI数据
-                processPOIData(pois);
-            } else {
-                console.log("POI搜索失败，使用预设数据");
-                // 如果API调用失败，使用我们已经更新的预设数据
-                // 不修改英雄区域的文本，保持"更多"文本不变
-                // const countElement = document.querySelector('#hero .text-xl .highlight');
-                // if (countElement) {
-                //     countElement.textContent = `${artGalleries.length}+`;
-                // }
-                
-                // 更新现有艺术馆的图片
-                updateExistingGalleryImages();
-            }
-        });
-    });
+    console.log("使用预设的艺术馆数据...");
     
     // 添加一个加载状态提示
     const galleryListContainer = document.getElementById('gallery-list');
@@ -212,56 +183,28 @@ function fetchMoreGalleries() {
         loadingElement.innerHTML = '<div class="text-tesla-red"><i class="fas fa-spinner fa-spin fa-2x"></i></div><p class="mt-4">正在加载武汉艺术馆数据...</p>';
         galleryListContainer.appendChild(loadingElement);
         
-        // 3秒后移除加载提示，如果还存在的话
+        // 2秒后移除加载提示，并渲染艺术馆列表
         setTimeout(() => {
             const loadingElement = document.getElementById('gallery-loading');
             if (loadingElement) {
                 loadingElement.remove();
             }
-        }, 3000);
+            // 直接使用预设数据渲染艺术馆列表和地图标记
+            renderGalleryList(artGalleries);
+            addGalleryMarkers(artGalleries);
+        }, 2000);
+    } else {
+        // 如果没有找到容器，直接渲染
+        renderGalleryList(artGalleries);
+        addGalleryMarkers(artGalleries);
     }
 }
 
-// 更新现有艺术馆的图片
+// 不再更新艺术馆图片，使用预设图片
 function updateExistingGalleryImages() {
-    // 为每个艺术馆获取详细信息和图片
-    artGalleries.forEach((gallery, index) => {
-        // 使用高德地图API的POI搜索服务获取详情
-        AMap.plugin('AMap.PlaceSearch', function() {
-            const placeSearch = new AMap.PlaceSearch({
-                city: '武汉'
-            });
-            
-            placeSearch.search(gallery.name, function(status, result) {
-                if (status === 'complete' && result.info === 'OK' && result.poiList.pois.length > 0) {
-                    const poi = result.poiList.pois[0];
-                    
-                    // 如果有图片URL，更新艺术馆数据
-                    if (poi.photos) {
-                        if (Array.isArray(poi.photos) && poi.photos.length > 0 && poi.photos[0].url) {
-                            gallery.image = poi.photos[0].url;
-                            // 确保URL是完整的
-                            if (gallery.image && !gallery.image.startsWith('http')) {
-                                gallery.image = 'http://' + gallery.image;
-                            }
-                        } else if (poi.photos.url) {
-                            gallery.image = poi.photos.url;
-                            // 确保URL是完整的
-                            if (gallery.image && !gallery.image.startsWith('http')) {
-                                gallery.image = 'http://' + gallery.image;
-                            }
-                        }
-                    }
-                    
-                    // 如果是最后一个艺术馆，更新UI
-                    if (index === artGalleries.length - 1) {
-                        renderGalleryList(artGalleries);
-                        addGalleryMarkers(artGalleries);
-                    }
-                }
-            });
-        });
-    });
+    // 直接使用预设数据渲染
+    renderGalleryList(artGalleries);
+    addGalleryMarkers(artGalleries);
 }
 
 // DOM元素
@@ -295,105 +238,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// 处理高德地图API返回的POI数据
+// 处理高德地图API返回的POI数据 - 简化版，不再查询图片
 function processPOIData(pois) {
-    if (!pois || pois.length === 0) return;
+    // 此功能已禁用，不再从API获取POI数据
+    console.log("POI数据处理功能已禁用");
     
-    console.log(`获取到${pois.length}个POI数据点`);
-    
-    // 获取当前最大ID
-    const maxId = Math.max(...artGalleries.map(gallery => gallery.id));
-    let newId = maxId + 1;
-    
-    // 处理每个POI数据
-    pois.forEach(poi => {
-        // 检查是否已存在相同名称的艺术馆
-        const exists = artGalleries.some(gallery => gallery.name === poi.name);
-        if (exists) {
-            // 如果已存在，更新图片URL
-            const existingGallery = artGalleries.find(gallery => gallery.name === poi.name);
-            if (existingGallery && poi.photos) {
-                // 检查photos字段的结构
-                if (Array.isArray(poi.photos) && poi.photos.length > 0 && poi.photos[0].url) {
-                    existingGallery.image = poi.photos[0].url;
-                    // 确保URL是完整的
-                    if (existingGallery.image && !existingGallery.image.startsWith('http')) {
-                        existingGallery.image = 'http://' + existingGallery.image;
-                    }
-                } else if (poi.photos.url) {
-                    existingGallery.image = poi.photos.url;
-                    // 确保URL是完整的
-                    if (existingGallery.image && !existingGallery.image.startsWith('http')) {
-                        existingGallery.image = 'http://' + existingGallery.image;
-                    }
-                }
-            }
-            return;
-        }
-        
-        // 确定区域
-        let district = 'wuchang'; // 默认武昌
-        if (poi.address.includes('汉口') || poi.address.includes('江岸') || poi.address.includes('江汉')) {
-            district = 'hankou';
-        } else if (poi.address.includes('汉阳') || poi.address.includes('琴台')) {
-            district = 'hanyang';
-        }
-        
-        // 确定类型
-        let type = 'museum';
-        if (poi.name.includes('画廊') || poi.name.includes('艺廊')) {
-            type = 'gallery';
-        } else if (poi.name.includes('艺术中心') || poi.name.includes('艺术空间')) {
-            type = 'artspace';
-        }
-        
-        // 获取图片URL
-        let imageUrl = `https://via.placeholder.com/300x200.png?text=${encodeURIComponent(poi.name)}`;
-        if (poi.photos) {
-            // 检查photos字段的结构
-            if (Array.isArray(poi.photos) && poi.photos.length > 0 && poi.photos[0].url) {
-                imageUrl = poi.photos[0].url;
-                // 确保URL是完整的
-                if (imageUrl && !imageUrl.startsWith('http')) {
-                    imageUrl = 'http://' + imageUrl;
-                }
-            } else if (poi.photos.url) {
-                imageUrl = poi.photos.url;
-                // 确保URL是完整的
-                if (imageUrl && !imageUrl.startsWith('http')) {
-                    imageUrl = 'http://' + imageUrl;
-                }
-            }
-        }
-        
-        // 创建新的艺术馆对象
-        const newGallery = {
-            id: newId++,
-            name: poi.name,
-            enName: translateToEnglish(poi.name),
-            address: poi.address,
-            district: district,
-            type: type,
-            description: `${poi.name}是武汉市的一处艺术场所，位于${poi.address}。`,
-            openTime: "周二至周日 9:00-17:00",
-            ticket: "免费（特展除外）",
-            position: poi.location ? [poi.location.lng, poi.location.lat] : [114.3162, 30.5810],
-            image: imageUrl
-        };
-        
-        // 添加到艺术馆数组
-        artGalleries.push(newGallery);
-    });
-    
-    // 更新地图和列表
-    addGalleryMarkers(artGalleries);
+    // 直接使用预设数据渲染
     renderGalleryList(artGalleries);
-    
-    // 不修改英雄区域的文本，保持"更多"文本不变
-    // const countElement = document.querySelector('#hero .text-xl .highlight');
-    // if (countElement) {
-    //     countElement.textContent = `${artGalleries.length}+`;
-    // }
+    addGalleryMarkers(artGalleries);
 }
 
 // 简单的中文到英文翻译函数（仅用于示例）
@@ -545,9 +397,18 @@ function navigateTo(position, name) {
     
     const userPos = userMarker.getPosition();
     
-    // 先将地图中心设置为目标位置
-    map.setCenter(position);
-    map.setZoom(15); // 设置适当的缩放级别以便查看目标位置
+    // 关闭可能打开的信息窗体
+    if (infoWindow) {
+        infoWindow.close();
+    }
+    if (window.userInfoWindow) {
+        window.userInfoWindow.close();
+    }
+    
+    // 先将地图中心设置为目标位置和用户位置的中间点
+    const centerLng = (position[0] + userPos.lng) / 2;
+    const centerLat = (position[1] + userPos.lat) / 2;
+    map.setCenter([centerLng, centerLat]);
     
     // 显示路线规划面板
     const routePanel = document.getElementById('route-panel');
@@ -571,13 +432,20 @@ function navigateTo(position, name) {
         }
     });
     
+    // 显示加载状态
+    const loadingToast = document.createElement('div');
+    loadingToast.className = 'fixed top-4 right-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg z-50';
+    loadingToast.innerHTML = '<i class="fas fa-route mr-2"></i> 正在规划路线...';
+    loadingToast.id = 'route-loading-toast';
+    document.body.appendChild(loadingToast);
+    
     // 使用高德地图驾车导航
     AMap.plugin('AMap.Driving', function() {
         const driving = new AMap.Driving({
             map: map,
-            panel: document.getElementById('route-info'),
             hideMarkers: false,
-            autoFitView: true
+            autoFitView: true,
+            policy: AMap.DrivingPolicy.LEAST_TIME // 最快捷模式
         });
         
         // 保存当前导航实例，以便后续可以清除
@@ -589,10 +457,19 @@ function navigateTo(position, name) {
             position, // 终点
             { waypoints: [] }, // 途经点
             function(status, result) {
+                // 移除加载提示
+                const loadingToast = document.getElementById('route-loading-toast');
+                if (loadingToast) {
+                    loadingToast.remove();
+                }
+                
                 // 导航结果回调
                 if (status === 'complete') {
                     // 确保路线完全显示在地图上
-                    map.setFitView();
+                    map.setFitView([userMarker].concat(galleryMarkers.filter(marker => 
+                        marker.getPosition().lng === position[0] && 
+                        marker.getPosition().lat === position[1]
+                    )));
                     
                     // 更新路线信息面板
                     const routeInfo = document.getElementById('route-info');
@@ -619,17 +496,44 @@ function navigateTo(position, name) {
                                 `).join('')}
                             </div>
                         `;
+                        
+                        // 显示成功提示
+                        const successToast = document.createElement('div');
+                        successToast.className = 'fixed top-4 right-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg z-50';
+                        successToast.innerHTML = '<i class="fas fa-check-circle mr-2"></i> 路线规划成功';
+                        document.body.appendChild(successToast);
+                        setTimeout(() => {
+                            successToast.remove();
+                        }, 2000);
                     }
                 } else {
-                    document.getElementById('route-info').innerHTML = `<p class="text-red-500">导航失败，请稍后再试</p>`;
+                    console.error('路线规划失败:', result);
+                    document.getElementById('route-info').innerHTML = `
+                        <p class="text-red-500 mb-2">导航失败，请稍后再试</p>
+                        <p class="text-sm">错误信息: ${result.info || '未知错误'}</p>
+                    `;
+                    
+                    // 显示错误提示
+                    const errorToast = document.createElement('div');
+                    errorToast.className = 'fixed top-4 right-4 bg-black bg-opacity-70 text-red-500 px-4 py-2 rounded-lg z-50';
+                    errorToast.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i> 路线规划失败';
+                    document.body.appendChild(errorToast);
+                    setTimeout(() => {
+                        errorToast.remove();
+                    }, 3000);
                 }
-            }
-        );
-    });
+              }
+          );
+      });
 }
 
 // 定位用户位置
 function locateUser() {
+    // 清除可能存在的旧信息窗体
+    if (window.userInfoWindow) {
+        window.userInfoWindow.close();
+    }
+    
     map.plugin('AMap.Geolocation', function() {
         const geolocation = new AMap.Geolocation({
             enableHighAccuracy: true,
@@ -639,8 +543,20 @@ function locateUser() {
             zoomToAccuracy: true
         });
         
-        map.addControl(geolocation);
+        // 显示加载状态
+        const loadingToast = document.createElement('div');
+        loadingToast.className = 'fixed top-4 right-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg z-50';
+        loadingToast.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> 正在获取您的位置...';
+        loadingToast.id = 'location-loading-toast';
+        document.body.appendChild(loadingToast);
+        
         geolocation.getCurrentPosition(function(status, result) {
+            // 移除加载提示
+            const loadingToast = document.getElementById('location-loading-toast');
+            if (loadingToast) {
+                loadingToast.remove();
+            }
+            
             if (status === 'complete') {
                 // 定位成功
                 const position = result.position;
@@ -656,7 +572,8 @@ function locateUser() {
                             image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
                             imageSize: new AMap.Size(32, 32)
                         }),
-                        zIndex: 100
+                        zIndex: 100,
+                        title: '您的位置'
                     });
                     userMarker.setMap(map);
                 }
@@ -666,14 +583,25 @@ function locateUser() {
                 map.setZoom(14);
                 
                 // 显示用户位置信息窗体
-                const infoWindow = new AMap.InfoWindow({
-                    content: '<div style="text-align: center;">您的位置</div>',
-                    offset: new AMap.Pixel(0, -30)
+                window.userInfoWindow = new AMap.InfoWindow({
+                    content: '<div style="text-align: center; padding: 5px;"><strong>您的位置</strong></div>',
+                    offset: new AMap.Pixel(0, -30),
+                    closeWhenClickMap: true
                 });
-                infoWindow.open(map, position);
+                window.userInfoWindow.open(map, position);
+                
+                // 显示成功提示
+                const successToast = document.createElement('div');
+                successToast.className = 'fixed top-4 right-4 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg z-50';
+                successToast.innerHTML = '<i class="fas fa-check-circle mr-2"></i> 定位成功';
+                document.body.appendChild(successToast);
+                setTimeout(() => {
+                    successToast.remove();
+                }, 2000);
             } else {
                 // 定位失败
-                alert('定位失败，请检查您的位置权限设置');
+                console.error('定位失败:', result);
+                alert('定位失败，请检查您的位置权限设置或网络连接');
             }
         });
     });

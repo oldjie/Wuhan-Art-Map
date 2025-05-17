@@ -155,12 +155,12 @@
                 const heroBottom = heroSection.getBoundingClientRect().bottom;
                 if (heroBottom <= 0) {
                     // 当滚动超过英雄区域时，添加背景色
-                    header.classList.add('bg-black', 'bg-opacity-80');
-                    header.classList.remove('bg-transparent');
+                    header.classList.remove('bg-opacity-30');
+                    header.classList.add('bg-opacity-80');
                 } else {
                     // 在英雄区域内保持透明
-                    header.classList.remove('bg-black', 'bg-opacity-80');
-                    header.classList.add('bg-transparent');
+                    header.classList.remove('bg-opacity-80');
+                    header.classList.add('bg-opacity-30');
                 }
             }
             
@@ -174,8 +174,8 @@
 </head>
 <body>
     <!-- 顶部导航 -->
-    <header class="fixed top-0 left-0 w-full z-50 bg-transparent backdrop-blur-sm transition-all duration-300 border-b border-gray-800" id="main-header">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <header class="fixed top-0 left-0 w-full z-50 bg-black bg-opacity-30 backdrop-blur-sm transition-all duration-300 border-b border-gray-800" id="main-header">
+        <div class="container mx-auto px-4 py-6 flex justify-between items-center">
             <div class="flex items-center">
                 <h1 class="text-2xl font-bold"><span class="text-tesla-red">武汉</span>艺术馆地图</h1>
                 <span class="ml-2 text-sm opacity-70">WUHAN ART MAP</span>
@@ -192,7 +192,7 @@
     </header>
 
     <!-- 英雄区域 -->
-    <section id="hero" class="section flex items-center justify-center relative">
+    <section id="hero" class="section pt-28 flex items-center justify-center relative">
         <!-- 艺术背景图片 - 仅用于英雄区域 -->
         <div class="absolute inset-0 z-[-1]" style="background-image: url('1_5uoa7hsDsdEdMdaB-hayXQ.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0.6; filter: brightness(1.2) contrast(1.1);"></div>
         <!-- 暗色叠加层，提高文字可读性 -->
@@ -265,9 +265,9 @@
     </section>
 
     <!-- 地图部分 -->
-    <section id="map" class="section">
+    <section id="map" class="section pt-28">
         <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold mb-6 reveal parallax">艺术馆<span class="highlight">地图</span> <span class="text-sm opacity-70">MAP</span></h2>
+            <h2 class="text-4xl font-bold mb-6 reveal parallax mt-8">艺术馆<span class="highlight">地图</span> <span class="text-sm opacity-70">MAP</span></h2>
             <div class="bento-grid">
                 <div class="col-span-12 md:col-span-8 reveal">
                     <div id="mapContainer" class="map-container scale-on-scroll" style="width:100%; height:0; padding-bottom:75%; position:relative; transform: scale(0.95); transition: transform 1.5s ease;">
