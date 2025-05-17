@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>武汉艺术馆地图 | WUHAN ART MAP</title>
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode: "ccd235b3e1bd71097ff524f560706024",
+        }
+      </script>
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Framer Motion -->
+    <script src="https://cdn.jsdelivr.net/npm/framer-motion@10.12.16/dist/framer-motion.js"></script>
+    <!-- 高德地图API -->
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=57ec8135ef40ec015201e8d54ba0ea3d"></script>
+    <script src="https://webapi.amap.com/ui/1.1/main.js"></script>
+    <!-- 自定义样式 -->
+    <style>
+        :root {
+            --tesla-red: #E31937;
+            --tesla-red-80: rgba(227, 25, 55, 0.8);
+            --tesla-red-60: rgba(227, 25, 55, 0.6);
+            --tesla-red-40: rgba(227, 25, 55, 0.4);
+            --tesla-red-20: rgba(227, 25, 55, 0.2);
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* 背景图片设置 - 移除全局背景 */
+        /* 英雄区域专用背景将在hero section中设置 */
+        
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .mega-text {
+            font-size: clamp(3rem, 10vw, 12rem);
+            font-weight: 900;
+            line-height: 0.9;
+        }
+        
+        .section {
+            min-height: 100vh;
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .highlight {
+            color: var(--tesla-red);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--tesla-red-60) 0%, var(--tesla-red-20) 100%);
+        }
+        
+        .map-container {
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        
+        .art-gallery-card {
+            background-color: rgba(20, 20, 20, 0.8);
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+        
+        .art-gallery-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(227, 25, 55, 0.3);
+            border-color: var(--tesla-red);
+        }
+        
+        .nav-button {
+            background-color: var(--tesla-red);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-button:hover {
+            background-color: #c01530;
+            transform: translateY(-2px);
+        }
+        
+        /* 滚动动效相关样式 */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease;
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--tesla-red-60);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--tesla-red);
+        }
+    </style>
+    <script>
+        // 配置Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tesla-red': '#E31937',
+                    }
+                }
+            }
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 处理顶栏背景变化
+            const header = document.getElementById('main-header');
+            const heroSection = document.getElementById('hero');
+            
+            function updateHeaderBackground() {
+                const heroBottom = heroSection.getBoundingClientRect().bottom;
+                if (heroBottom <= 0) {
+                    // 当滚动超过英雄区域时，添加背景色
+                    header.classList.add('bg-black', 'bg-opacity-80');
+                    header.classList.remove('bg-transparent');
+                } else {
+                    // 在英雄区域内保持透明
+                    header.classList.remove('bg-black', 'bg-opacity-80');
+                    header.classList.add('bg-transparent');
+                }
+            }
+            
+            // 初始调用一次
+            updateHeaderBackground();
+            
+            // 监听滚动事件
+            window.addEventListener('scroll', updateHeaderBackground);
+        });
+    </script>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="fixed top-0 left-0 w-full z-50 bg-transparent backdrop-blur-sm transition-all duration-300 border-b border-gray-800" id="main-header">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <h1 class="text-2xl font-bold"><span class="text-tesla-red">武汉</span>艺术馆地图</h1>
+                <span class="ml-2 text-sm opacity-70">WUHAN ART MAP</span>
+            </div>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><a href="#overview" class="hover:text-tesla-red transition">概览</a></li>
+                    <li><a href="#map" class="hover:text-tesla-red transition">地图</a></li>
+                    <li><a href="#galleries" class="hover:text-tesla-red transition">艺术馆</a></li>
+                    <li><a href="#about" class="hover:text-tesla-red transition">关于</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section id="hero" class="section flex items-center justify-center relative">
+        <!-- 艺术背景图片 - 仅用于英雄区域 -->
+        <div class="absolute inset-0 z-[-1]" style="background-image: url('1_5uoa7hsDsdEdMdaB-hayXQ.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0.6; filter: brightness(1.2) contrast(1.1);"></div>
+        <!-- 暗色叠加层，提高文字可读性 -->
+        <div class="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-70 z-0"></div>
+        
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="bento-grid">
+                <div class="col-span-12 md:col-span-7 flex flex-col justify-center reveal">
+                    <h1 class="mega-text">武汉<span class="highlight">艺术</span><br><span class="highlight">地图</span></h1>
+                    <p class="text-xl md:text-2xl mt-4 max-w-2xl font-medium">探索<span class="text-white font-bold">更多</span>艺术，感受九省通衢的文化魅力</p>
+                    <p class="text-sm mt-2 opacity-70 tracking-wider">WUHAN ART GALLERIES MAPPING PROJECT</p>
+                    <div class="mt-8">
+                        <a href="#map" class="nav-button inline-flex items-center group">
+                            开始探索 <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-span-12 md:col-span-5 flex items-center justify-center reveal" style="transition-delay: 0.2s;">
+                    <div class="relative w-full h-80 md:h-96">
+                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="absolute top-0 left-0 w-full h-full animate-pulse" style="animation-duration: 3s;">
+                            <path fill="var(--tesla-red-40)" d="M45.7,-76.3C59.9,-69.8,72.7,-58.8,80.4,-44.7C88.2,-30.6,90.8,-13.3,88.7,3C86.6,19.3,79.8,34.6,69.6,46.5C59.4,58.4,45.8,66.8,31.7,72.1C17.5,77.3,2.9,79.3,-12.4,77.8C-27.7,76.3,-43.8,71.3,-56.8,61.5C-69.8,51.7,-79.8,37.2,-84.1,21.2C-88.5,5.2,-87.2,-12.2,-80.8,-27.2C-74.4,-42.1,-62.9,-54.5,-49.2,-61.3C-35.5,-68.1,-19.6,-69.3,-2.9,-65.1C13.8,-60.9,31.5,-82.8,45.7,-76.3Z" transform="translate(100 100)" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center backdrop-blur-sm bg-black bg-opacity-30 p-8 rounded-full">
+                                <span class="text-6xl font-bold">ART</span>
+                                <div class="text-tesla-red text-2xl font-bold mt-2">探索之旅</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 概览部分 -->
+    <section id="overview" class="section pt-24">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-12 reveal parallax">艺术<span class="highlight">概览</span> <span class="text-sm opacity-70">OVERVIEW</span></h2>
+            <div class="bento-grid reveal">
+                <div class="col-span-12 md:col-span-4 gradient-bg p-8 rounded-2xl fade-on-scroll" style="opacity: 0; transition: opacity 1.2s ease, transform 1.2s ease;">
+                    <div class="text-5xl mb-4"><i class="fas fa-building-columns"></i></div>
+                    <h3 class="text-2xl font-bold mb-2">多元艺术空间</h3>
+                    <p>从国家级美术馆到独立艺术空间，武汉拥有丰富多样的艺术场所</p>
+                </div>
+                <div class="col-span-12 md:col-span-4 bg-gray-900 p-8 rounded-2xl fade-on-scroll" style="opacity: 0; transition: opacity 1.2s ease 0.2s, transform 1.2s ease 0.2s;">
+                    <div class="text-5xl mb-4 text-tesla-red"><i class="fas fa-location-dot"></i></div>
+                    <h3 class="text-2xl font-bold mb-2">便捷导航</h3>
+                    <p>一键导航至目的地，轻松规划您的艺术之旅</p>
+                </div>
+                <div class="col-span-12 md:col-span-4 bg-gray-900 p-8 rounded-2xl fade-on-scroll" style="opacity: 0; transition: opacity 1.2s ease 0.4s, transform 1.2s ease 0.4s;">
+                    <div class="text-5xl mb-4 text-tesla-red"><i class="fas fa-info-circle"></i></div>
+                    <h3 class="text-2xl font-bold mb-2">详尽信息</h3>
+                    <p>提供开放时间、票价及展览信息，助您做出明智决策</p>
+                </div>
+            </div>
+            
+            <div class="mt-20 reveal">
+                <div class="bento-grid">
+                    <div class="col-span-12 md:col-span-6">
+                        <h3 class="text-3xl font-bold mb-6">武汉<span class="highlight">艺术馆</span>分布</h3>
+                        <p class="mb-4">武汉三镇艺术馆分布情况：</p>
+                        <div id="district-bars"></div>
+                    </div>
+                    <div class="col-span-12 md:col-span-6 flex items-center justify-center">
+                        <svg id="district-map-svg" width="200" height="200" viewBox="0 0 200 200" class="w-full max-w-xs"></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 地图部分 -->
+    <section id="map" class="section">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-6 reveal parallax">艺术馆<span class="highlight">地图</span> <span class="text-sm opacity-70">MAP</span></h2>
+            <div class="bento-grid">
+                <div class="col-span-12 md:col-span-8 reveal">
+                    <div id="mapContainer" class="map-container scale-on-scroll" style="width:100%; height:0; padding-bottom:75%; position:relative; transform: scale(0.95); transition: transform 1.5s ease;">
+                        <style>
+                            .map-container .amap-container {
+                                position: absolute !important;
+                                top: 0;
+                                left: 0;
+                                width: 100% !important;
+                                height: 100% !important;
+                            }
+                        </style>
+                    </div>
+                </div>
+                <div class="col-span-12 md:col-span-4 reveal fade-on-scroll" style="transition-delay: 0.2s; opacity: 0; transition: opacity 1.2s ease 0.3s, transform 1.2s ease 0.3s;">
+                    <div class="bg-black bg-opacity-50 p-6 rounded-lg h-full">
+                        <h3 class="text-2xl font-bold mb-4">艺术馆<span class="highlight">筛选</span></h3>
+                        <div class="mb-4">
+                            <label for="district-filter" class="block mb-2">区域</label>
+                            <select id="district-filter" class="w-full bg-black border border-gray-700 rounded px-3 py-2">
+                                <option value="all">全部区域</option>
+                                <option value="wuchang">武昌区</option>
+                                <option value="hankou">汉口区</option>
+                                <option value="hanyang">汉阳区</option>
+                                <option value="jiangan">江岸区</option>
+                                <option value="caidian">蔡甸区</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="type-filter" class="block mb-2">类型</label>
+                            <select id="type-filter" class="w-full bg-black border border-gray-700 rounded px-3 py-2">
+                                <option value="all">全部类型</option>
+                                <option value="museum">美术馆</option>
+                                <option value="gallery">画廊</option>
+                                <option value="artspace">艺术空间</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="search-input" class="block mb-2">搜索</label>
+                            <input type="text" id="search-input" placeholder="输入关键词搜索..." class="w-full bg-black border border-gray-700 rounded px-3 py-2">
+                        </div>
+                        <div class="mt-6">
+                            <button id="locate-me" class="nav-button w-full">
+                                <i class="fas fa-location-arrow mr-2"></i> 定位我的位置
+                            </button>
+                        </div>
+                        
+                        <!-- 路线规划结果面板 -->
+                        <div id="route-panel" class="mt-6 bg-black bg-opacity-70 p-4 rounded-lg max-h-80 overflow-auto hidden">
+                            <h4 class="text-xl font-bold mb-2">路线<span class="highlight">规划</span></h4>
+                            <div class="text-sm">
+                                <p>路线信息将显示在这里...</p>
+                            </div>
+                            <button id="close-route" class="mt-4 text-sm text-tesla-red hover:text-white transition">
+                                <i class="fas fa-times mr-1"></i> 关闭路线
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 艺术馆列表部分 -->
+    <section id="galleries" class="section">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-12 reveal">艺术馆<span class="highlight">列表</span> <span class="text-sm opacity-70">GALLERIES</span></h2>
+            <div id="gallery-list" class="bento-grid">
+                <!-- 艺术馆卡片将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于部分 -->
+    <section id="about" class="section">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-12 reveal">关于<span class="highlight">项目</span> <span class="text-sm opacity-70">ABOUT</span></h2>
+            <div class="bento-grid">
+                <div class="col-span-12 md:col-span-6 reveal">
+                    <p class="text-xl mb-6">「武汉艺术地图」是为艺术爱好者打造的导航工具，旨在展示武汉丰富的艺术资源，帮助您轻松探索这座城市的艺术魅力。</p>
+                    <p class="mb-6">本项目数据来源于公开信息整理，持续更新中。如有建议或合作意向，欢迎联系我们。</p>
+                    <div class="flex space-x-4 mt-8">
+                        <a href="#" class="text-tesla-red hover:text-white transition"><i class="fab fa-weixin text-2xl"></i></a>
+                        <a href="#" class="text-tesla-red hover:text-white transition"><i class="fab fa-weibo text-2xl"></i></a>
+                        <a href="#" class="text-tesla-red hover:text-white transition"><i class="fas fa-envelope text-2xl"></i></a>
+                    </div>
+                </div>
+                <div class="col-span-12 md:col-span-6 reveal" style="transition-delay: 0.2s;">
+                    <div class="gradient-bg p-8 rounded-2xl">
+                        <h3 class="text-2xl font-bold mb-4">参与<span class="text-white">贡献</span></h3>
+                        <p class="mb-4">知道更多武汉的艺术空间？帮助我们完善数据库！</p>
+                        <form id="contribution-form" class="space-y-4">
+                            <div>
+                                <input type="text" placeholder="艺术馆名称" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg p-2">
+                            </div>
+                            <div>
+                                <input type="text" placeholder="地址" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg p-2">
+                            </div>
+                            <div>
+                                <textarea placeholder="简介" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg p-2 h-24"></textarea>
+                            </div>
+                            <div>
+                                <button type="submit" class="nav-button w-full">提交信息</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-black border-t border-gray-800 py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold"><span class="text-tesla-red">武汉</span>艺术馆地图</h2>
+                    <p class="text-sm opacity-70 mt-1">© 2023 WUHAN ART MAP. All rights reserved.</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <ul class="flex space-x-6">
+                        <li><a href="#" class="hover:text-tesla-red transition">隐私政策</a></li>
+                        <li><a href="#" class="hover:text-tesla-red transition">使用条款</a></li>
+                        <li><a href="#" class="hover:text-tesla-red transition">联系我们</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+</body>
+</html>
