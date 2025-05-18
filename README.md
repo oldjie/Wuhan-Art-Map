@@ -76,3 +76,4 @@ marker.on('click', () => showInfoWindow(gallery))
 | 移动端适配困难 | 用 `padding-bottom: 75%` 保持 16:9 比例自适应容器 |
 
 ---
+![8cd423bf731f66ab31c73e1f6c73903](https://github.com/user-attachments/assets/d68d7a23-9bc4-41a5-b062-f60bff2c0bca)
