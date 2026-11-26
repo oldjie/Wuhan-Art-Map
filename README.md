@@ -4,7 +4,6 @@
   <p>Discover Wuhan through its art museums, galleries and creative spaces.</p>
   <p>
     <a href="#项目介绍">项目介绍</a> ·
-    <a href="#界面预览">界面预览</a> ·
     <a href="#核心功能">核心功能</a> ·
     <a href="#技术实现">技术实现</a> ·
     <a href="#本地运行">本地运行</a>
@@ -14,19 +13,11 @@
     <img src="https://img.shields.io/badge/JavaScript-ES6%2B-454545" alt="JavaScript ES6+">
     <img src="https://img.shields.io/badge/UI-Tailwind%20CSS-454545" alt="Tailwind CSS">
   </p>
-  <img src="hero_background.jpg" alt="武汉艺术地图视觉背景" width="100%">
 </div>
 
 ## 项目介绍
 
 武汉艺术地图是一款面向城市艺术资源探索的交互式 WebGIS 应用。项目将分散的艺术场馆信息组织在统一的地图与列表中，结合空间分布可视化、分类检索和位置服务，为了解武汉的城市艺术空间提供直观入口。
-
-## 界面预览
-
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/d68d7a23-9bc4-41a5-b062-f60bff2c0bca" alt="武汉艺术地图项目界面" width="100%">
-  <p><sub>城市艺术概览与交互地图</sub></p>
-</div>
 
 ## 核心功能
 
@@ -144,6 +135,10 @@ Wuhan-Art-Map/
 场馆信息来源于公开资料整理，开放时间、地址及实际运营状态可能变化，请以场馆官方信息为准。地图及第三方图片遵循相应服务和权利人的使用规则。
 
 欢迎通过 [GitHub Issues](https://github.com/oldjie/Wuhan-Art-Map/issues) 提交场馆信息纠正、功能建议与问题反馈。当前仓库未包含独立许可证文件。
+
+## 技术博文
+
+详细的项目设计与技术实现介绍见：[武汉艺术地图项目技术博文（CSDN）](https://blog.csdn.net/hbw68/article/details/148048351?spm=1001.2014.3001.5502)。
 
 ---
 
