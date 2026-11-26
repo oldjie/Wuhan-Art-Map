@@ -32,28 +32,6 @@
 
 ## 技术实现
 
-### 技术栈
-
-| 技术 | 用途 |
-| --- | --- |
-| HTML / JavaScript | 页面结构、数据处理与交互逻辑 |
-| Tailwind CSS | 响应式布局与视觉样式 |
-| 高德地图 JavaScript API 2.0 | 地图渲染、标记、信息窗体、定位与路线规划 |
-| SVG | 区域分布示意与统计可视化 |
-| Font Awesome | 界面图标 |
-
-### 数据与交互架构
-
-```mermaid
-flowchart LR
-    A[预设艺术场馆 POI] --> B[区域 / 类型 / 关键词筛选]
-    B --> C[地图标记]
-    B --> D[场馆列表]
-    A --> E[区域分布统计]
-    C --> F[场馆信息窗体]
-    F --> G[路线规划]
-```
-
 当前仓库使用 `js/main.js` 中预设的艺术场馆数据。早期 MCP + AMap 方案用于探索关键词检索与 POI 整理；运行时动态 POI 查询和图片更新目前已停用。
 
 ### 1. POI 检索与数据整理
@@ -134,9 +112,9 @@ Wuhan-Art-Map/
 
 场馆信息来源于公开资料整理，开放时间、地址及实际运营状态可能变化，请以场馆官方信息为准。地图及第三方图片遵循相应服务和权利人的使用规则。
 
-欢迎通过 [GitHub Issues](https://github.com/oldjie/Wuhan-Art-Map/issues) 提交场馆信息纠正、功能建议与问题反馈。当前仓库未包含独立许可证文件。
+欢迎通过 [GitHub Issues](https://github.com/oldjie/Wuhan-Art-Map/issues) 提交场馆信息纠正、功能建议与问题反馈。
 
-## 技术博文
+## 更多
 
 详细的项目设计与技术实现介绍见：[武汉艺术地图项目技术博文（CSDN）](https://blog.csdn.net/hbw68/article/details/148048351?spm=1001.2014.3001.5502)。
 
