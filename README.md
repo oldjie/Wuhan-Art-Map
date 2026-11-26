@@ -116,7 +116,7 @@ Wuhan-Art-Map/
 
 ## 更多
 
-详细的项目设计与技术实现介绍见：[武汉艺术地图项目技术博文（CSDN）](https://blog.csdn.net/hbw68/article/details/148048351?spm=1001.2014.3001.5502)。
+详细的项目设计与技术实现介绍见：[AI + 高德MCP，我做了一张「武汉艺术地图」](https://blog.csdn.net/hbw68/article/details/148048351?spm=1001.2014.3001.5502)。
 
 ---
 
